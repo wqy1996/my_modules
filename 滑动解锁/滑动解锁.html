@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>花里胡哨滑块解锁</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        height: 900px;
+        border: 1px solid #f33;
+        text-align: center;
+      }
+
+      div.container {
+        -webkit-user-select: none;
+        margin: 200px;
+      }
+      div.simg {
+        position: relative;
+        width: 400px;
+        margin: 0 auto;
+      }
+
+      .simg i {
+        width: 60px;
+        height: 60px;
+        position: absolute;
+        border-radius: 5px;
+      }
+
+      .simg i.target {
+        background: #fff8;
+        left: 0;
+        top: 0;
+      }
+
+      .simg i.origin {
+        background-image: url("");
+        background-repeat: no-repeat;
+        background-position: -20px -50px;
+        /* background-attachment: fixed; */
+        z-index: 2;
+        left: 0;
+        bottom: 50px;
+        /* border:1px solid red; */
+      }
+
+      img {
+        width: 400px;
+        height: 400px;
+      }
+
+      p.strip {
+        border-radius: 5px;
+        margin: 20px auto;
+        width: 400px;
+        height: 40px;
+        background: linear-gradient(to right, #17e, #7bd, #e7d, #64c);
+        /* background: linear-gradient(to left, #17e, #7bd, #e7d, #64c); */
+
+        line-height: 40px;
+        font-size: 20px;
+        color: #fff;
+        position: relative;
+      }
+
+      i.step {
+        display: block;
+        width: 0;
+        height: 40px;
+        position: absolute;
+        background: linear-gradient(to left, /* #17e, */ #7bd, #e7d /* #64c */);
+        opacity: 1;
+      }
+
+      span.lump {
+        display: inline-block;
+        position: absolute;
+        width: 60px;
+        height: 40px;
+        background: #7bd;
+        left: 0;
+        border-radius: 5px;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        cursor: pointer;
+        color: #17e;
+      }
+
+      .restore {
+        transition: all 0.3s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="simg">
+        <img alt="" /> <i class="target"> <!-- 这个是遮罩层 --> </i>
+        <i class="origin"> <!-- 这个是小拼图 --> </i>
+      </div>
+      <p class="strip">
+        <i class="step "> </i> <span class="lump"> | | | </span>
+        <span> 滑动滑块解锁 </span>
+      </p>
+    </div>
+
+    <script>
+      /*初始化图片剪裁位置*/
+      var target = document.getElementsByClassName("target")[0]; // 遮罩层
+      var origin = document.getElementsByClassName("origin")[0]; // 小拼图
+      var tLeft = Math.round(Math.random() * 140 + 200); // 遮罩层左边的距离
+      var tTop = Math.round(Math.random() * 340); // 遮罩层上面的距离
+      var img = document.getElementsByTagName("img")[0]; // 图片
+      var bgImg = Math.ceil(Math.random() * 4); // 一共四张图片，每次刷新随机一张
+      img.src = "./lock/lock" + bgImg + ".jpg"; //修改图片路径
+      origin.style.backgroundImage = "url(./lock/lock" + bgImg + ".jpg)"; // 修改小拼图路径
+      target.style.left = tLeft + "px"; // 初始化遮罩层的X坐标
+      target.style.top = tTop + "px"; // 初始化遮罩层的Y坐标
+      origin.style.top = tTop + "px"; // 初始化小拼图的Y坐标
+      origin.style.backgroundPositionX = -1 * tLeft + "px"; // 初始化小拼图的截取X坐标
+      origin.style.backgroundPositionY = -1 * tTop + "px";  // 初始化小拼图的截取Y坐标
+
+      var strip = document.getElementsByClassName("strip")[0]; // 拖拽的父级长条
+      var iStep = strip.getElementsByTagName("i")[0]; // 拖拽后的轨迹
+      var spanLump = strip.getElementsByTagName("span")[0]; // 用来拖拽的小方块
+
+      spanLump.onmousedown = function() {  // 当鼠标按下的时候 清除之前的动画的影响
+        spanLump.classList.remove("restore");
+        origin.classList.remove("restore");
+        iStep.classList.remove("restore");
+        
+        document.onmousemove = function(e) {
+          var distance =
+            e.clientX - strip.offsetLeft - spanLump.offsetWidth / 2;
+          if (distance > 340) {
+            distance = 340;
+          } else if (distance < 0) {
+            distance = 0;
+          } else {
+          }
+          iStep.style.width = spanLump.style.left = origin.style.left =
+            distance + "px";
+        };
+      };
+
+      document.onmouseup = function() {
+        document.onmousemove = null;
+        var difference = Math.abs(parseInt(spanLump.style.left) - tLeft);
+        if (difference <= 5) {
+          window.location.reload();
+          console.log("成功");
+        } else {
+          spanLump.className += " restore";
+          origin.className += " restore";
+          iStep.className += " restore";
+          iStep.style.width = spanLump.style.left = origin.style.left = 0;
+        }
+      };
+    </script>
+  </body>
+</html>
